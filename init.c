@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: valrakot <valrakot@student.42antananari    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/09/23 12:31:03 by valrakot          #+#    #+#             */
+/*   Updated: 2026/09/23 14:17:39 by valrakot         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 long long	get_time_in_ms(void)
@@ -24,11 +36,10 @@ static int	init_dongles(t_sim *sim)
 			return (1);
 		if (pthread_cond_init(&sim->dongles[i].cond, NULL) != 0)
 			return (1);
-
-		// Initialisation du Min-Heap pour la file d'attente
 		sim->dongles[i].queue.capacity = sim->number_of_coders;
 		sim->dongles[i].queue.size = 0;
-		sim->dongles[i].queue.data = malloc(sizeof(t_heap_node) * sim->number_of_coders);
+		sim->dongles[i].queue.data = malloc(
+				sizeof(t_heap_node) * sim->number_of_coders);
 		if (!sim->dongles[i].queue.data)
 			return (1);
 		i++;
@@ -42,8 +53,8 @@ static void	assign_dongles(t_sim *sim, int i)
 	if (sim->number_of_coders == 1)
 		sim->coders[i].right_dongle = &sim->dongles[i];
 	else
-		sim->coders[i].right_dongle =
-			&sim->dongles[(i + 1) % sim->number_of_coders];
+		sim->coders[i].right_dongle = &sim->dongles[
+			(i + 1) % sim->number_of_coders];
 }
 
 static int	init_coders(t_sim *sim)
@@ -60,7 +71,7 @@ static int	init_coders(t_sim *sim)
 		sim->coders[i].compiles_done = 0;
 		sim->coders[i].last_compile_start = sim->start_time;
 		sim->coders[i].is_dead = 0;
-		sim->coders[i].sim = sim; // Correction du pointeur sim
+		sim->coders[i].sim = sim;
 		assign_dongles(sim, i);
 		i++;
 	}
@@ -71,7 +82,6 @@ int	init_simulation(t_sim *sim)
 {
 	sim->start_time = get_time_in_ms();
 	sim->is_simulation_over = 0;
-
 	if (pthread_mutex_init(&sim->print_lock, NULL) != 0)
 		return (1);
 	if (pthread_mutex_init(&sim->sim_lock, NULL) != 0)

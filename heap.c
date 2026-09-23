@@ -1,12 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   heap.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: valrakot <valrakot@student.42antananari    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/09/23 14:13:25 by valrakot          #+#    #+#             */
+/*   Updated: 2026/09/23 14:13:47 by valrakot         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
-static int	is_higher_priority(
-	t_heap_node a, t_heap_node b, char *scheduler
-)
+static int	is_higher_priority(t_heap_node a, t_heap_node b, char *sched)
 {
 	if (a.key != b.key)
 		return (a.key < b.key);
-	if (strcmp(scheduler, "edf") == 0)
+	if (strcmp(sched, "edf") == 0)
 		return (a.coder->id < b.coder->id);
 	return (0);
 }
@@ -20,9 +30,7 @@ static void	swap_nodes(t_heap_node *a, t_heap_node *b)
 	*b = tmp;
 }
 
-int	heap_push(
-	t_heap *heap, t_coder *coder, long long key, char *scheduler
-)
+int	heap_push(t_heap *heap, t_coder *coder, long long key, char *scheduler)
 {
 	int	i;
 	int	parent;
@@ -36,7 +44,8 @@ int	heap_push(
 	while (i > 0)
 	{
 		parent = (i - 1) / 2;
-		if (is_higher_priority(heap->data[i], heap->data[parent], scheduler))
+		if (is_higher_priority(heap->data[i], heap->data[parent],
+				scheduler))
 		{
 			swap_nodes(&heap->data[i], &heap->data[parent]);
 			i = parent;
@@ -47,48 +56,39 @@ int	heap_push(
 	return (0);
 }
 
+static void	heapify_down(t_heap *heap, char *scheduler)
+{
+	int	i;
+	int	s;
+	int	l;
+
+	i = 0;
+	while (1)
+	{
+		s = i;
+		l = 2 * i + 1;
+		if (l < heap->size && is_higher_priority(heap->data[l],
+				heap->data[s], scheduler))
+			s = l;
+		if (l + 1 < heap->size && is_higher_priority(heap->data[l + 1],
+				heap->data[s], scheduler))
+			s = l + 1;
+		if (s == i)
+			break ;
+		swap_nodes(&heap->data[i], &heap->data[s]);
+		i = s;
+	}
+}
+
 t_coder	*heap_pop(t_heap *heap, char *scheduler)
 {
 	t_coder	*top_coder;
-	int		i;
-	int		left;
-	int		right;
-	int		smallest;
 
 	if (heap->size == 0)
 		return (NULL);
 	top_coder = heap->data[0].coder;
 	heap->data[0] = heap->data[heap->size - 1];
 	heap->size--;
-	i = 0;
-	while (1)
-	{
-		left = 2 * i + 1;
-		right = 2 * i + 2;
-		smallest = i;
-		if (
-			left < heap->size && is_higher_priority(
-				heap->data[left],
-				heap->data[smallest],
-				scheduler
-			)
-		)
-			smallest = left;
-		if (
-			right < heap->size && is_higher_priority(
-				heap->data[right],
-				heap->data[smallest],
-				scheduler
-			)
-		)
-			smallest = right;
-		if (smallest != i)
-		{
-			swap_nodes(&heap->data[i], &heap->data[smallest]);
-			i = smallest;
-		}
-		else
-			break ;
-	}
+	heapify_down(heap, scheduler);
 	return (top_coder);
 }
