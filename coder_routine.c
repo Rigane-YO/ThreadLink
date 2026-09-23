@@ -10,7 +10,7 @@ void	print_state(t_coder *coder, char *state)
 		timestap = get_time_in_ms() - coder->sim->start_time;
 		printf("%lld %d %s\n", timestap, coder->id, state);
 	}
-	phread_mutex_unlock(&coder->sim->sim_lock);
+	pthread_mutex_unlock(&coder->sim->sim_lock);
 	pthread_mutex_unlock(&coder->sim->print_lock);
 }
 

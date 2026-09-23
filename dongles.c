@@ -62,7 +62,7 @@ void take_dongles(t_coder *coder)
 
 static void release_single_dongle(t_coder *coder, t_dongle *dongle)
 {
-	phtread_mutex_lock(&dongle->mutex);
+	pthread_mutex_lock(&dongle->mutex);
 
 	dongle->available_at = get_time_in_ms() + coder->sim->dongle_cooldown;
 

@@ -2,31 +2,33 @@
 
 static long long	ft_atol_check(const char *str)
 {
-	long long res;
-	int	i;
+	long long	res;
+	int			i;
 
 	i = 0;
 	res = 0;
-
-	if(!str || !str[0])
+	if (!str || !str[0])
 		return (-1);
-	if(str[i] == '+')
+	if (str[i] == '+')
 		i++;
-	while(str[i])
+	while (str[i])
 	{
-		if(str[i] < '0' || str[i] > '9')
-			return -1;
+		if (str[i] < '0' || str[i] > '9')
+			return (-1);
 		res = res * 10 + (str[i] - '0');
-		if(res > 2147483647)
-			return -1;
+		if (res > 2147483647)
+			return (-1);
+		i++; // Fix : Incrémentation nécessaire pour éviter la boucle infinie
 	}
-	return res;
+	return (res);
 }
 
-int pars_arg(t_sim *sim, int argc, char **argv)
+// Fix : Nom harmonisé avec 'parse_args' utilisé dans main.c et codexion.h
+int	parse_args(t_sim *sim, int argc, char **argv)
 {
 	if (argc != 9)
 		return (printf("Erreur: Nombre d'arguments incorrect.\n"), 1);
+
 	sim->number_of_coders = (int)ft_atol_check(argv[1]);
 	sim->time_to_burnout = ft_atol_check(argv[2]);
 	sim->time_to_compile = ft_atol_check(argv[3]);

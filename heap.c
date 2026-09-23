@@ -1,19 +1,19 @@
 #include "codexion.h"
 
-static int is_higher_priority(
+static int	is_higher_priority(
 	t_heap_node a, t_heap_node b, char *scheduler
 )
 {
 	if (a.key != b.key)
 		return (a.key < b.key);
 	if (strcmp(scheduler, "edf") == 0)
-		return(a.coder->id < b.coder->id);
-	return(0);
+		return (a.coder->id < b.coder->id);
+	return (0);
 }
 
-static void swap_nodes(t_heap_node *a, t_heap_node *b)
+static void	swap_nodes(t_heap_node *a, t_heap_node *b)
 {
-	t_heap_node tmp;
+	t_heap_node	tmp;
 
 	tmp = *a;
 	*a = *b;
@@ -35,19 +35,19 @@ int	heap_push(
 	heap->size++;
 	while (i > 0)
 	{
-		parent = (i - 1)/2;
+		parent = (i - 1) / 2;
 		if (is_higher_priority(heap->data[i], heap->data[parent], scheduler))
 		{
 			swap_nodes(&heap->data[i], &heap->data[parent]);
 			i = parent;
 		}
 		else
-			break;
+			break ;
 	}
 	return (0);
 }
 
-t_coder *heap_pop(t_heap *heap, char *scheduler)
+t_coder	*heap_pop(t_heap *heap, char *scheduler)
 {
 	t_coder	*top_coder;
 	int		i;
@@ -55,7 +55,7 @@ t_coder *heap_pop(t_heap *heap, char *scheduler)
 	int		right;
 	int		smallest;
 
-	if (heap -> size == 0)
+	if (heap->size == 0)
 		return (NULL);
 	top_coder = heap->data[0].coder;
 	heap->data[0] = heap->data[heap->size - 1];
@@ -84,11 +84,11 @@ t_coder *heap_pop(t_heap *heap, char *scheduler)
 			smallest = right;
 		if (smallest != i)
 		{
-			swap_nodes(&heap->data, &heap->data[smallest]);
+			swap_nodes(&heap->data[i], &heap->data[smallest]);
 			i = smallest;
 		}
 		else
-			break;
+			break ;
 	}
-	return(top_coder);
+	return (top_coder);
 }

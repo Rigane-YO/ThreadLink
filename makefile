@@ -5,7 +5,7 @@ CFLAGS		= -Wall -Wextra -Werror -pthread
 INCLUDES	= -I.
 
 SRCS		= main.c \
-			  parse_args.c \
+			  parse_arg.c \
 			  init.c \
 			  clean.c \
 			  heap.c \
