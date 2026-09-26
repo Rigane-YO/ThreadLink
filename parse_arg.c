@@ -6,7 +6,7 @@
 /*   By: valrakot <valrakot@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/23 12:31:12 by valrakot          #+#    #+#             */
-/*   Updated: 2026/09/23 14:27:21 by valrakot         ###   ########.fr       */
+/*   Updated: 2026/09/26 12:21:34 by valrakot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ static long long	ft_atol_check(const char *str)
 int	parse_args(t_sim *sim, int argc, char **argv)
 {
 	if (argc != 9)
-		return (printf("Erreur: Nombre d'arguments incorrect.\n"), 1);
+		return (printf("Error: Incorrect number of arguments.\n"), 1);
 	sim->number_of_coders = (int)ft_atol_check(argv[1]);
 	sim->time_to_burnout = ft_atol_check(argv[2]);
 	sim->time_to_compile = ft_atol_check(argv[3]);
@@ -48,9 +48,12 @@ int	parse_args(t_sim *sim, int argc, char **argv)
 	sim->dongle_cooldown = ft_atol_check(argv[7]);
 	if (sim->number_of_coders <= 0 || sim->time_to_burnout <= 0
 		|| sim->time_to_compile <= 0 || sim->time_to_debug <= 0
-		|| sim->time_to_refactor <= 0 || sim->number_compiles_required <= 0
+		|| sim->time_to_refactor <= 0 || sim->number_compiles_required < 0
 		|| sim->dongle_cooldown < 0)
-		return (printf("Erreur: Argument numérique invalide ou <= 0.\n"), 1);
+		return (printf("Error: Invalid numeric argument or <= 0.\n"), 1);
+	if (sim->number_compiles_required == 0)
+		return (
+			printf("number of compilations = 0, so no compilation\n"), 1);
 	if (strcmp(argv[8], "fifo") != 0 && strcmp(argv[8], "edf") != 0)
 		return (printf("Erreur: Le scheduler doit être 'fifo' ou 'edf'.\n"), 1);
 	sim->scheduler = argv[8];
