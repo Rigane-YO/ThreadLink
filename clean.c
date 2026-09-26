@@ -6,7 +6,7 @@
 /*   By: valrakot <valrakot@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/23 12:30:33 by valrakot          #+#    #+#             */
-/*   Updated: 2026/09/23 19:20:46 by valrakot         ###   ########.fr       */
+/*   Updated: 2026/09/26 10:12:33 by valrakot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,5 @@ void	clean_simulation(t_sim *sim)
 		sim->coders = NULL;
 	}
 	pthread_mutex_destroy(&sim->print_lock);
-
 	pthread_mutex_destroy(&sim->sim_lock);
 }
