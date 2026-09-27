@@ -22,6 +22,9 @@ void	clean_simulation(t_sim *sim)
 		while (i < sim->number_of_coders)
 		{
 			pthread_mutex_destroy(&sim->dongles[i].mutex);
+			pthread_cond_destroy(&sim->dongles[i].cond);
+			if (sim->dongles[i].queue.data)
+				free(sim->dongles[i].queue.data);
 			i++;
 		}
 		free(sim->dongles);
