@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   codexion.h                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: valrakot <valrakot@student.42antananari    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/09/23 12:30:40 by valrakot          #+#    #+#             */
+/*   Updated: 2026/09/23 12:35:21 by valrakot         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef CODEXION_H
 # define CODEXION_H
 
@@ -64,27 +76,21 @@ struct s_sim
 	t_coder			*coders;
 };
 
-/* --- Prototypes des fonctions --- */
-
-// Temps et utilitaires
 long long	get_time_in_ms(void);
 void		ft_usleep(long long time_in_ms, t_sim *sim);
 void		print_state(t_coder *coder, char *state);
 
-// Parsing et initialisation
 int			parse_args(t_sim *sim, int argc, char **argv);
 int			init_simulation(t_sim *sim);
 void		clean_simulation(t_sim *sim);
 
-// Gestion du Min-Heap (File de priorité)
-int			heap_push(t_heap *heap, t_coder *coder, long long key, char *scheduler);
+int			heap_push(
+				t_heap *heap, t_coder *coder, long long key, char *scheduler);
 t_coder		*heap_pop(t_heap *heap, char *scheduler);
 
-// Synchronisation des dongles
 void		take_dongles(t_coder *coder);
 void		release_dongles(t_coder *coder);
 
-// Routines des threads
 void		*coder_routine(void *arg);
 void		*monitor_routine(void *arg);
 
