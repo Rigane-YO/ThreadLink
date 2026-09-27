@@ -66,7 +66,7 @@ static int init_coders(t_sim *sim)
 
 int init_simulation(t_sim *sim)
 {
-	sim->start_time = get_time_im_ms();
+	sim->start_time = get_time_in_ms();
 	sim->is_simulation_over = 0;
 	if (pthread_mutex_init(&sim->print_lock, NULL) != 0)
 		return(1);
