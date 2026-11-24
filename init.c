@@ -33,28 +33,38 @@ static int	init_dongles(t_sim *sim)
 		sim->dongles[i].id = i + 1;
 		sim->dongles[i].available_at = 0;
 		sim->dongles[i].is_held = 0;
-		sim->dongles[i].next_seq = 0;
-		if (pthread_mutex_init(&sim->dongles[i].mutex, NULL) != 0)
-			return (1);
-		sim->dongles[i].queue.capacity = sim->number_of_coders;
-		sim->dongles[i].queue.size = 0;
-		sim->dongles[i].queue.data = malloc(
-				sizeof(t_heap_node) * sim->number_of_coders);
-		if (!sim->dongles[i].queue.data)
-			return (1);
 		i++;
 	}
+	return (0);
+}
+
+static int	init_pending(t_sim *sim)
+{
+	sim->pending.capacity = sim->number_of_coders;
+	sim->pending.size = 0;
+	sim->pending.data = malloc(sizeof(t_heap_node) * sim->number_of_coders);
+	if (!sim->pending.data)
+		return (1);
+	sim->scratch = malloc(sizeof(t_heap_node) * sim->number_of_coders);
+	if (!sim->scratch)
+		return (1);
+	sim->next_seq = 0;
 	return (0);
 }
 
 static void	assign_dongles(t_sim *sim, int i)
 {
 	sim->coders[i].left_dongle = &sim->dongles[i];
+	sim->dongles[i].owner_a = &sim->coders[i];
 	if (sim->number_of_coders == 1)
 		sim->coders[i].right_dongle = &sim->dongles[i];
 	else
+	{
 		sim->coders[i].right_dongle = &sim->dongles[
-			(i + 1) % sim->number_of_coders];
+				(i + 1) % sim->number_of_coders];
+		sim->dongles[(i + 1) % sim->number_of_coders].owner_b
+			= &sim->coders[i];
+	}
 }
 
 static int	init_coders(t_sim *sim)
@@ -71,6 +81,7 @@ static int	init_coders(t_sim *sim)
 		sim->coders[i].compiles_done = 0;
 		sim->coders[i].last_compile_start = sim->start_time;
 		sim->coders[i].is_dead = 0;
+		sim->coders[i].dongles_granted = 0;
 		sim->coders[i].sim = sim;
 		assign_dongles(sim, i);
 		i++;
@@ -96,7 +107,8 @@ int	init_simulation(t_sim *sim)
 		pthread_mutex_destroy(&sim->print_lock);
 		return (1);
 	}
-	if (init_dongles(sim) != 0 || init_coders(sim) != 0)
+	if (init_dongles(sim) != 0 || init_pending(sim) != 0
+		|| init_coders(sim) != 0)
 	{
 		pthread_mutex_destroy(&sim->dongle_lock);
 		pthread_cond_destroy(&sim->dongle_cond);

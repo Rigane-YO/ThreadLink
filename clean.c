@@ -6,7 +6,7 @@
 /*   By: valrakot <valrakot@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/23 12:30:33 by valrakot          #+#    #+#             */
-/*   Updated: 2026/11/24 10:24:50 by valrakot         ###   ########.fr       */
+/*   Updated: 2026/11/24 07:57:51 by valrakot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,20 @@
 
 void	clean_simulation(t_sim *sim)
 {
-	int	i;
-
 	if (sim->dongles)
 	{
-		i = 0;
-		while (i < sim->number_of_coders)
-		{
-			pthread_mutex_destroy(&sim->dongles[i].mutex);
-			if (sim->dongles[i].queue.data)
-				free(sim->dongles[i].queue.data);
-			i++;
-		}
 		free(sim->dongles);
 		sim->dongles = NULL;
+	}
+	if (sim->pending.data)
+	{
+		free(sim->pending.data);
+		sim->pending.data = NULL;
+	}
+	if (sim->scratch)
+	{
+		free(sim->scratch);
+		sim->scratch = NULL;
 	}
 	if (sim->coders)
 	{

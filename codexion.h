@@ -42,11 +42,10 @@ typedef struct s_heap
 struct s_dongle
 {
 	int				id;
-	pthread_mutex_t	mutex;
 	long long		available_at;
 	int				is_held;
-	long long		next_seq;
-	t_heap			queue;
+	struct s_coder	*owner_a;
+	struct s_coder	*owner_b;
 };
 
 struct s_coder
@@ -58,6 +57,7 @@ struct s_coder
 	pthread_t		thread;
 	t_dongle		*left_dongle;
 	t_dongle		*right_dongle;
+	int				dongles_granted;
 	t_sim			*sim;
 };
 
@@ -77,6 +77,9 @@ struct s_sim
 	pthread_mutex_t	sim_lock;
 	pthread_mutex_t	dongle_lock;
 	pthread_cond_t	dongle_cond;
+	t_heap			pending;
+	t_heap_node		*scratch;
+	long long		next_seq;
 	t_dongle		*dongles;
 	t_coder			*coders;
 };

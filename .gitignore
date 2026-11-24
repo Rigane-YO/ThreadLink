@@ -2,3 +2,4 @@ codexion
 *.o
 codexion_asan
 codexion_tsan
+*.txt

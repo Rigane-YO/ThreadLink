@@ -316,9 +316,13 @@ The implementation must coordinate dongle acquisition so that coders do not rema
 
 ### Starvation
 
-Starvation occurs when a coder repeatedly loses access to a required dongle while other coders continue to be served.
+Starvation occurs when a coder repeatedly loses access to a required dongle while other coders continue to be served. The scheduling mechanism uses a single global priority queue (FIFO or EDF) to decide, every time a dongle frees up, which waiting coder should receive it next.
 
-The scheduling mechanism uses FIFO or EDF priority to determine which waiting coder should receive a dongle.
+A subtler form of starvation showed up during testing: each dongle has at most two possible claimants (its two ring neighbours). A coder that only needs its *own* two dongles releases and re-acquires them at perfectly synchronised instants, since both become available again at exactly `release_time + dongle_cooldown`. A neighbouring coder whose other dongle depends on a *different* coder's release can miss that instant by a few milliseconds of ordinary thread-scheduling jitter. If that happens every cycle, the self-synchronised pair can win the same dongle round after round, starving the neighbour even though the neighbour has stale, more deserving priority.
+
+The fix is a short "grace period": before granting a free dongle to a ready coder, the scheduler checks whether that dongle's *other* possible owner has strictly higher priority (an older FIFO timestamp, or an earlier EDF deadline) and is about to become ready on its own remaining dongle (within `STARVATION_GRACE_MS`, currently 20ms). If so, the grant is deferred by one scheduling pass instead of handing the dongle to the lower-priority coder that happened to be ready first.
+
+This does not remove the underlying topological limit of an odd-sized ring: with an odd number of coders, the dongles cannot be perfectly two-coloured, so at least one coder periodically experiences a cycle roughly twice as long as the others. With a generous `time_to_burnout` relative to `dongle_cooldown` this is invisible; with very tight parameters (for example 5 coders, `dongle_cooldown=800`, `time_to_burnout=3000`) it can still produce a burnout that is inherent to the physical resource layout rather than a scheduling bug — an even number of coders, or a larger `time_to_burnout`, removes it.
 
 ### Dongle Cooldown
 
