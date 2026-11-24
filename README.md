@@ -358,6 +358,19 @@ printf("%lld %d %s\n", timestamp, coder->id, state);
 pthread_mutex_unlock(&sim->print_lock);
 ```
 
+### Coffman conditions
+
+Deadlock requires all four Coffman conditions at once. The design removes two of them so that a cycle can never form:
+
+- **Mutual exclusion**: enforced on purpose. Each dongle has an `is_held` flag, set and cleared under its own mutex. A dongle can never be held by two coders at the same time.
+- **Hold and wait**: eliminated. A coder never marks a single dongle as held while still waiting for the other one. It registers its request on both dongles, then checks and takes both of them atomically in one short critical section (`take_both_if_ready`, under both dongle mutexes at once). Either both are granted together, or neither is, and the coder keeps waiting without holding anything.
+- **No preemption**: kept. A dongle is never taken away from a coder.
+- **Circular wait**: prevented. The two dongles of any coder are always locked and acquired in increasing identifier order, so the wait-for graph has no cycle.
+
+Removing hold-and-wait also makes the implementation more robust under heavy dongle contention, where a coder holding one dongle while waiting for a busy second one could otherwise stall other coders that need the first one back.
+
+The single-coder case never requests a second dongle; it simply waits for the burnout.
+
 ## Data Structures
 
 ### `t_sim`

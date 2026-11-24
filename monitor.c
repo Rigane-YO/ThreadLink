@@ -14,16 +14,9 @@
 
 static void	wake_all_coders(t_sim *sim)
 {
-	int	i;
-
-	i = 0;
-	while (i < sim->number_of_coders)
-	{
-		pthread_mutex_lock(&sim->dongles[i].mutex);
-		pthread_cond_broadcast(&sim->dongles[i].cond);
-		pthread_mutex_unlock(&sim->dongles[i].mutex);
-		i++;
-	}
+	pthread_mutex_lock(&sim->dongle_lock);
+	pthread_cond_broadcast(&sim->dongle_cond);
+	pthread_mutex_unlock(&sim->dongle_lock);
 }
 
 static int	handle_burnout(t_sim *sim, int id, long long now)

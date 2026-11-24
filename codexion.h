@@ -15,6 +15,7 @@
 
 # include <pthread.h>
 # include <sys/time.h>
+# include <time.h>
 # include <unistd.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -28,6 +29,7 @@ typedef struct s_heap_node
 {
 	t_coder		*coder;
 	long long	key;
+	long long	seq;
 }				t_heap_node;
 
 typedef struct s_heap
@@ -41,8 +43,9 @@ struct s_dongle
 {
 	int				id;
 	pthread_mutex_t	mutex;
-	pthread_cond_t	cond;
 	long long		available_at;
+	int				is_held;
+	long long		next_seq;
 	t_heap			queue;
 };
 
@@ -72,6 +75,8 @@ struct s_sim
 	int				is_simulation_over;
 	pthread_mutex_t	print_lock;
 	pthread_mutex_t	sim_lock;
+	pthread_mutex_t	dongle_lock;
+	pthread_cond_t	dongle_cond;
 	t_dongle		*dongles;
 	t_coder			*coders;
 };
@@ -84,11 +89,11 @@ int			parse_args(t_sim *sim, int argc, char **argv);
 int			init_simulation(t_sim *sim);
 void		clean_simulation(t_sim *sim);
 
-int			heap_push(
-				t_heap *heap, t_coder *coder, long long key, char *scheduler);
+int			heap_push(t_heap *heap, t_coder *coder, long long key,
+				long long seq, char *scheduler);
 t_coder		*heap_pop(t_heap *heap, char *scheduler);
 
-void		take_dongles(t_coder *coder);
+int			take_dongles(t_coder *coder);
 void		release_dongles(t_coder *coder);
 
 void		*coder_routine(void *arg);

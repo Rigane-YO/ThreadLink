@@ -32,9 +32,9 @@ static int	init_dongles(t_sim *sim)
 	{
 		sim->dongles[i].id = i + 1;
 		sim->dongles[i].available_at = 0;
+		sim->dongles[i].is_held = 0;
+		sim->dongles[i].next_seq = 0;
 		if (pthread_mutex_init(&sim->dongles[i].mutex, NULL) != 0)
-			return (1);
-		if (pthread_cond_init(&sim->dongles[i].cond, NULL) != 0)
 			return (1);
 		sim->dongles[i].queue.capacity = sim->number_of_coders;
 		sim->dongles[i].queue.size = 0;
@@ -89,14 +89,17 @@ int	init_simulation(t_sim *sim)
 		pthread_mutex_destroy(&sim->print_lock);
 		return (1);
 	}
-	if (init_dongles(sim) != 0)
+	if (pthread_mutex_init(&sim->dongle_lock, NULL) != 0
+		|| pthread_cond_init(&sim->dongle_cond, NULL) != 0)
 	{
 		pthread_mutex_destroy(&sim->sim_lock);
 		pthread_mutex_destroy(&sim->print_lock);
 		return (1);
 	}
-	if (init_coders(sim) != 0)
+	if (init_dongles(sim) != 0 || init_coders(sim) != 0)
 	{
+		pthread_mutex_destroy(&sim->dongle_lock);
+		pthread_cond_destroy(&sim->dongle_cond);
 		pthread_mutex_destroy(&sim->sim_lock);
 		pthread_mutex_destroy(&sim->print_lock);
 		return (1);

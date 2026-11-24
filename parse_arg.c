@@ -55,7 +55,7 @@ int	parse_args(t_sim *sim, int argc, char **argv)
 		return (
 			printf("number of compilations = 0, so no compilation\n"), 1);
 	if (strcmp(argv[8], "fifo") != 0 && strcmp(argv[8], "edf") != 0)
-		return (printf("Erreur: Le scheduler doit être 'fifo' ou 'edf'.\n"), 1);
+		return (printf("Error: scheduler must be 'fifo' or 'edf'.\n"), 1);
 	sim->scheduler = argv[8];
 	return (0);
 }

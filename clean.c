@@ -6,7 +6,7 @@
 /*   By: valrakot <valrakot@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/23 12:30:33 by valrakot          #+#    #+#             */
-/*   Updated: 2026/11/24 07:57:51 by valrakot         ###   ########.fr       */
+/*   Updated: 2026/11/24 10:24:50 by valrakot         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ void	clean_simulation(t_sim *sim)
 		while (i < sim->number_of_coders)
 		{
 			pthread_mutex_destroy(&sim->dongles[i].mutex);
-			pthread_cond_destroy(&sim->dongles[i].cond);
 			if (sim->dongles[i].queue.data)
 				free(sim->dongles[i].queue.data);
 			i++;
@@ -37,4 +36,6 @@ void	clean_simulation(t_sim *sim)
 	}
 	pthread_mutex_destroy(&sim->print_lock);
 	pthread_mutex_destroy(&sim->sim_lock);
+	pthread_mutex_destroy(&sim->dongle_lock);
+	pthread_cond_destroy(&sim->dongle_cond);
 }

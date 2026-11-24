@@ -56,7 +56,8 @@ static int	is_sim_over(t_coder *coder)
 
 static void	coder_cycle(t_coder *coder)
 {
-	take_dongles(coder);
+	if (!take_dongles(coder))
+		return ;
 	pthread_mutex_lock(&coder->sim->sim_lock);
 	coder->last_compile_start = get_time_in_ms();
 	pthread_mutex_unlock(&coder->sim->sim_lock);
@@ -72,11 +73,22 @@ static void	coder_cycle(t_coder *coder)
 	ft_usleep(coder->sim->time_to_refactor, coder->sim);
 }
 
+static void	wait_until_over(t_coder *coder)
+{
+	while (!is_sim_over(coder))
+		usleep(500);
+}
+
 void	*coder_routine(void *arg)
 {
 	t_coder	*coder;
 
 	coder = (t_coder *)arg;
+	if (coder->sim->number_of_coders == 1)
+	{
+		wait_until_over(coder);
+		return (NULL);
+	}
 	if (coder->id % 2 == 0)
 		ft_usleep(coder->sim->time_to_compile / 10, coder->sim);
 	while (!is_sim_over(coder))
