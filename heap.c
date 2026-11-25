@@ -14,6 +14,12 @@
 
 static int	is_higher_priority(t_heap_node a, t_heap_node b, char *sched)
 {
+	if (strcmp(sched, "lifo") == 0)
+	{
+		if (a.key != b.key)
+			return (a.key > b.key);
+		return (a.seq > b.seq);
+	}
 	if (a.key != b.key)
 		return (a.key < b.key);
 	if (strcmp(sched, "edf") == 0)
@@ -30,8 +36,7 @@ static void	swap_nodes(t_heap_node *a, t_heap_node *b)
 	*b = tmp;
 }
 
-int	heap_push(t_heap *heap, t_coder *coder, long long key,
-		long long seq, char *scheduler)
+int	heap_push(t_heap *heap, t_heap_node node, char *scheduler)
 {
 	int	i;
 	int	parent;
@@ -39,9 +44,7 @@ int	heap_push(t_heap *heap, t_coder *coder, long long key,
 	if (heap->size >= heap->capacity)
 		return (1);
 	i = heap->size;
-	heap->data[i].coder = coder;
-	heap->data[i].key = key;
-	heap->data[i].seq = seq;
+	heap->data[i] = node;
 	heap->size++;
 	while (i > 0)
 	{

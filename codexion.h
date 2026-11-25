@@ -89,13 +89,34 @@ void		ft_usleep(long long time_in_ms, t_sim *sim);
 void		print_state(t_coder *coder, char *state);
 
 int			parse_args(t_sim *sim, int argc, char **argv);
+int			init_dongles(t_sim *sim);
+int			init_pending(t_sim *sim);
+int			init_coders(t_sim *sim);
 int			init_simulation(t_sim *sim);
 void		clean_simulation(t_sim *sim);
 
-int			heap_push(t_heap *heap, t_coder *coder, long long key,
-				long long seq, char *scheduler);
+int			heap_push(t_heap *heap, t_heap_node node, char *scheduler);
 t_coder		*heap_pop(t_heap *heap, char *scheduler);
 
+/*
+** Two coders may both be able to re-claim a dongle at essentially the
+** same instant (a self-contained pair releases and re-acquires its
+** own two dongles in perfect lockstep, while a neighbour that depends
+** on a *different* coder's dongle can miss the window by a few
+** milliseconds of scheduling jitter). STARVATION_GRACE_MS gives a
+** higher-priority neighbour who is almost ready a short window to
+** catch up instead of being skipped over forever by a lower-priority
+** coder who happens to be ready first.
+*/
+# define STARVATION_GRACE_MS 20
+
+long long	compute_key(t_coder *coder);
+void		order_dongles(t_coder *coder, t_dongle **first, t_dongle **second);
+int			pair_is_ready(t_dongle *first, t_dongle *second, long long now);
+t_coder		*other_owner(t_dongle *dongle, t_coder *coder);
+int			rival_almost_ready(t_coder *rival, t_dongle *shared, long long now);
+void		try_grant_pending(t_sim *sim);
+int			wait_for_grant(t_coder *coder);
 int			take_dongles(t_coder *coder);
 void		release_dongles(t_coder *coder);
 
